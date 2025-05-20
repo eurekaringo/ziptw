@@ -554,13 +554,13 @@ function App() {
   const [ocrLoading, setOcrLoading] = useState(false);
   const fileInputRef = useRef();
 
-  // 產生自動完成建議並即時查詢
+  // 產生自動完成建議（不自動查詢）
   const handleInputChange = (value) => {
     setAddress(value);
+    setError(null); // 輸入時清空錯誤
     if (!value) {
       setSuggestions([]);
       setResult(null);
-      setError(null);
       setCandidates([]);
       return;
     }
@@ -578,11 +578,6 @@ function App() {
         return { value: z.city + z.district, label: z.city + z.district };
       });
     setSuggestions(unique);
-    // debounce 自動查詢
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
-      doSearch(value);
-    }, 300);
   };
 
   // 選擇建議時自動查詢
@@ -592,7 +587,7 @@ function App() {
     doSearch(value);
   };
 
-  // 查詢邏輯（可重複呼叫）
+  // 查詢按鈕才查詢
   const doSearch = (inputValue) => {
     setLoading(true);
     setError(null);
