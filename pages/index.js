@@ -139,8 +139,13 @@ export default function Home() {
         return;
       }
     }
-    // 模糊搜尋：找所有可能的 city/district 組合
-    const matched = zipcodeDB.filter(z => value.includes(z.district) || value.includes(z.city));
+    // 模糊搜尋：找所有 city/district/縣市+區 只要有包含輸入字串的
+    const matched = zipcodeDB.filter(z =>
+      value.includes(z.district) ||
+      value.includes(z.city) ||
+      (z.city + z.district).includes(value) ||
+      (z.district + z.city).includes(value)
+    );
     if (matched.length === 1) {
       setResult({ city: matched[0].city, district: matched[0].district, road: '', zipcode: matched[0].zipcode });
       setAddress(matched[0].city + matched[0].district);
@@ -153,7 +158,6 @@ export default function Home() {
       return;
     }
     // 完全比對不到，進行相似建議（字打錯時）
-    // 取所有 city/district/縣市+區，計算 Levenshtein 距離
     function getLevenshtein(a, b) {
       const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
       for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
@@ -169,7 +173,6 @@ export default function Home() {
       }
       return matrix[a.length][b.length];
     }
-    // 取最相近的前 3 筆
     const allNames = [
       ...new Set([
         ...zipcodeDB.map(z => z.city),
@@ -180,7 +183,7 @@ export default function Home() {
     const similar = allNames
       .map(name => ({ name, dist: getLevenshtein(value, name) }))
       .sort((a, b) => a.dist - b.dist)
-      .filter(x => x.dist <= 2) // 只顯示距離2以內的
+      .filter(x => x.dist <= 2)
       .slice(0, 3);
     if (similar.length > 0) {
       setError(`找不到完全符合的資料，您是不是要找：${similar.map(x => x.name).join('、')}？`);
