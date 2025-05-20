@@ -13,10 +13,13 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
   },
   "dependencies": {
+    "@ant-design/icons": "^6.0.0",
+    "antd": "^5.25.2",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "styled-components": "^5.3.10"
+    "styled-components": "^5.3.10",
+    "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
@@ -43,7 +46,9 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
     }
