@@ -770,13 +770,13 @@ function App() {
       >
         <p>本功能僅用於即時辨識地址，圖片不會上傳或儲存。請確認您同意使用相機進行辨識。</p>
       </Modal>
+      {/* 查詢錯誤訊息顯示在輸入框下方 */}
       {error && (
         <Alert
-          message="錯誤"
-          description={error}
+          message={error}
           type="error"
           showIcon
-          style={{ marginTop: 16 }}
+          style={{ marginTop: 8 }}
         />
       )}
       {candidates.length > 1 && (
