@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
 import { Input, Card, Typography, Space, Descriptions, Alert, Button, message, AutoComplete, Modal } from 'antd';
 import { CopyOutlined, CameraOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 import './ui.css';
 import Tesseract from 'tesseract.js';
+import { createRoot } from 'react-dom/client';
 
 const { Title } = Typography;
 
@@ -806,4 +806,6 @@ function App() {
   );
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);
