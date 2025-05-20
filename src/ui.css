@@ -1,25 +1,79 @@
-body { font-family: Arial, sans-serif; padding: 1rem; }
-h1 { color: #1890ff; }
+/* Reset & 基本字型 */
+body, html, #__next {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans TC', 'Noto Sans JP', 'Noto Sans', Arial, sans-serif;
+  background: #f7f7f9;
+  min-height: 100vh;
+}
 
 .app-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
-  min-height: 100vh;
-  background-color: #f5f5f5;
+  max-width: 700px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0001;
+  padding: 32px 24px 40px 24px;
 }
 
-.app-container h1 {
-  text-align: center;
+h1 {
   color: #1890ff;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
   margin-bottom: 32px;
-  font-size: 28px;
 }
 
+/* 搜尋列與按鈕 */
 .ant-input-search {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  overflow: hidden;
+  font-size: 1.1rem;
+}
+.ant-btn-primary {
+  background: #1890ff;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* 語言切換下拉 */
+.lang-dropdown {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  z-index: 10;
+}
+
+/* Popup 與 Blur */
+.popup-blur {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.15);
+}
+
+/* 響應式設計 */
+@media (max-width: 900px) {
+  .app-container {
+    max-width: 98vw;
+    padding: 16px 4vw 32px 4vw;
+  }
+}
+@media (max-width: 600px) {
+  .app-container {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 8vw 2vw 24vw 2vw;
+  }
+  h1 {
+    font-size: 1.2rem;
+    margin-bottom: 18px;
+  }
+  .lang-dropdown {
+    top: 12px;
+    right: 12px;
+  }
 }
 
 .ant-card {
@@ -45,27 +99,7 @@ h1 { color: #1890ff; }
   border-radius: 8px;
 }
 
-.ant-btn-primary {
-  height: 40px;
-  font-size: 16px;
-  border-radius: 4px;
-}
-
 @media (max-width: 576px) {
-  .app-container {
-    padding: 16px;
-  }
-
-  .app-container h1 {
-    font-size: 24px;
-    margin-bottom: 24px;
-  }
-
-  .ant-card p {
-    font-size: 14px;
-  }
-
-  /* 修正查詢欄與按鈕排版 */
   .app-container > div {
     flex-direction: column !important;
     gap: 8px !important;

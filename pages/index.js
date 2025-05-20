@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Input, Card, Typography, Space, Descriptions, Alert, Button, message, AutoComplete, Modal } from 'antd';
+import { Input, Card, Typography, Space, Descriptions, Alert, Button, message, AutoComplete, Modal, Dropdown, Menu } from 'antd';
 import { CopyOutlined, CameraOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 import Tesseract from 'tesseract.js';
@@ -71,6 +71,12 @@ function getZipcode(city, district) {
   return found ? found.zipcode : '';
 }
 
+const LANGS = [
+  { key: 'zh-TW', label: '中文' },
+  { key: 'en', label: 'English' },
+  { key: 'ja', label: '日本語' },
+];
+
 export default function Home() {
   const [address, setAddress] = useState('');
   const [result, setResult] = useState(null);
@@ -82,6 +88,56 @@ export default function Home() {
   const [privacyVisible, setPrivacyVisible] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const fileInputRef = useRef();
+  const [lang, setLang] = useState('zh-TW');
+
+  // 多語字典（僅示意，實際可擴充）
+  const dict = {
+    'zh-TW': {
+      title: '中華郵政郵遞區號查詢助手',
+      search: '查詢',
+      inputPlaceholder: '請輸入完整地址或區名',
+      photo: '拍照輸入',
+      privacyTitle: '隱私權同意',
+      privacyText: '本功能僅用於即時辨識地址，圖片不會上傳或儲存。請確認您同意使用相機進行辨識。',
+      agree: '同意並啟用相機',
+      cancel: '取消',
+      notFound: '找不到對應的郵遞區號',
+      multi: '有多個結果符合，請選擇：',
+      copyZip: '複製郵遞區號',
+      copyAddr: '複製地址',
+      copyAll: '複製地址+郵遞區號',
+    },
+    'en': {
+      title: 'Taiwan Postal Code Helper',
+      search: 'Search',
+      inputPlaceholder: 'Enter full address or district',
+      photo: 'Photo Input',
+      privacyTitle: 'Privacy Consent',
+      privacyText: 'This feature is only for instant address recognition. No images will be uploaded or stored. Please confirm your consent to use the camera.',
+      agree: 'Agree and Enable Camera',
+      cancel: 'Cancel',
+      notFound: 'No matching postal code found',
+      multi: 'Multiple results found, please select:',
+      copyZip: 'Copy Zipcode',
+      copyAddr: 'Copy Address',
+      copyAll: 'Copy Address + Zipcode',
+    },
+    'ja': {
+      title: '台湾郵便番号検索アシスタント',
+      search: '検索',
+      inputPlaceholder: '住所または地区名を入力してください',
+      photo: '写真入力',
+      privacyTitle: 'プライバシー同意',
+      privacyText: 'この機能は即時住所認識のみに使用されます。画像はアップロードまたは保存されません。カメラの使用に同意してください。',
+      agree: '同意してカメラを有効化',
+      cancel: 'キャンセル',
+      notFound: '該当する郵便番号が見つかりません',
+      multi: '複数の結果が見つかりました。選択してください：',
+      copyZip: '郵便番号をコピー',
+      copyAddr: '住所をコピー',
+      copyAll: '住所+郵便番号をコピー',
+    },
+  };
 
   // 產生自動完成建議（不自動查詢）
   const handleInputChange = (value) => {
@@ -262,7 +318,16 @@ export default function Home() {
 
   return (
     <div className="app-container">
-      <h1>中華郵政郵遞區號查詢助手</h1>
+      {/* 語言切換下拉 */}
+      <div className="lang-dropdown">
+        <Dropdown
+          overlay={<Menu onClick={({ key }) => setLang(key)} items={LANGS} />}
+          trigger={['click']}
+        >
+          <Button>{LANGS.find(l => l.key === lang)?.label}</Button>
+        </Dropdown>
+      </div>
+      <h1>{dict[lang].title}</h1>
       <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
         <AutoComplete
           style={{ flex: 1 }}
@@ -270,18 +335,18 @@ export default function Home() {
           value={address}
           onChange={handleInputChange}
           onSelect={handleSelectSuggestion}
-          placeholder="請輸入完整地址或區名"
+          placeholder={dict[lang].inputPlaceholder}
           filterOption={false}
         >
           <Input.Search
-            enterButton="查詢"
+            enterButton={dict[lang].search}
             loading={loading || ocrLoading}
             size="large"
             onSearch={() => doSearch(address)}
           />
         </AutoComplete>
         <Button icon={<CameraOutlined />} size="large" onClick={handleCameraClick} loading={ocrLoading}>
-          拍照輸入
+          {dict[lang].photo}
         </Button>
         <input
           type="file"
@@ -292,15 +357,19 @@ export default function Home() {
           onChange={handleFileChange}
         />
       </div>
+      {/* 隱私 popup + blur */}
+      {privacyVisible && <div className="popup-blur" />}
       <Modal
-        title="隱私權同意"
+        title={dict[lang].privacyTitle}
         open={privacyVisible}
         onOk={handlePrivacyOk}
         onCancel={() => setPrivacyVisible(false)}
-        okText="同意並啟用相機"
-        cancelText="取消"
+        okText={dict[lang].agree}
+        cancelText={dict[lang].cancel}
+        mask={false}
+        centered
       >
-        <p>本功能僅用於即時辨識地址，圖片不會上傳或儲存。請確認您同意使用相機進行辨識。</p>
+        <p>{dict[lang].privacyText}</p>
       </Modal>
       {/* 查詢錯誤訊息顯示在輸入框下方 */}
       {error && (
@@ -313,7 +382,7 @@ export default function Home() {
       )}
       {candidates.length > 1 && (
         <Card style={{ marginTop: 16 }}>
-          <p>有多個結果符合，請選擇：</p>
+          <p>{dict[lang].multi}</p>
           {candidates.map((item, idx) => (
             <Button key={idx} style={{ margin: 4 }} onClick={() => handleSelectCandidate(item)}>
               {item.city} {item.district}（{item.zipcode}）
@@ -328,9 +397,9 @@ export default function Home() {
           <p><strong>路名：</strong>{result.road}</p>
           <p><strong>郵遞區號：</strong>{result.zipcode}</p>
           <Space>
-            <Button type="primary" onClick={handleCopyZip}>複製郵遞區號</Button>
-            <Button onClick={handleCopyAddress}>複製地址</Button>
-            <Button onClick={handleCopyAll}>複製地址+郵遞區號</Button>
+            <Button type="primary" onClick={handleCopyZip}>{dict[lang].copyZip}</Button>
+            <Button onClick={handleCopyAddress}>{dict[lang].copyAddr}</Button>
+            <Button onClick={handleCopyAll}>{dict[lang].copyAll}</Button>
           </Space>
         </Card>
       )}
