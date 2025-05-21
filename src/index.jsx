@@ -94,18 +94,24 @@ const districts = [
   '南竿鄉', '北竿鄉', '莒光鄉', '東引鄉'
 ];
 
+// 新增：抽取街路名稱（去除巷弄號等資訊）
+function extractStreetName(address) {
+  // 只取到「路/街/大道/巷/村/里」等常見街路名稱
+  const match = address.match(/([\u4e00-\u9fa5A-Za-z0-9]+(路|街|大道|巷|村|里))/);
+  return match ? match[0] : address;
+}
+
 // 標準順序解析
 function parseTaiwanAddress(address) {
-  // 移除空白
   address = address.trim();
-  
+  // 先抽取街路名稱
+  const streetName = extractStreetName(address);
   // 嘗試從資料庫中尋找完全匹配
-  const exactMatch = zipcodeDB.find(item => 
-    address.includes(item.city) && 
-    address.includes(item.district) && 
-    address.includes(item.street)
+  const exactMatch = zipcodeDB.find(item =>
+    address.includes(item.city) &&
+    address.includes(item.district) &&
+    (address.includes(item.street) || streetName === item.street)
   );
-  
   if (exactMatch) {
     return {
       city: exactMatch.city,
@@ -114,29 +120,40 @@ function parseTaiwanAddress(address) {
       zipcode: exactMatch.zipcode
     };
   }
-  
   // 如果沒有完全匹配，使用模糊匹配
   return fuzzyParseAddress(address);
 }
 
 // 強化模糊解析：不管順序，找出縣市、區名
 function fuzzyParseAddress(address) {
-  // 移除空白
   address = address.trim();
-  
-  // 初始化結果
+  const streetName = extractStreetName(address);
   let bestMatch = null;
   let bestScore = 0;
-  
-  // 遍歷資料庫尋找最佳匹配
   for (const item of zipcodeDB) {
-    const score = getLevenshtein(address, item.street);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = item;
+    // 只比對街路名稱
+    if (address.includes(item.city) && address.includes(item.district)) {
+      // 完全包含縣市區，街路名稱用最長前綴比對
+      if (streetName.startsWith(item.street) || item.street.startsWith(streetName)) {
+        return {
+          city: item.city,
+          district: item.district,
+          street: item.street,
+          zipcode: item.zipcode
+        };
+      }
+    }
+    // 若只包含街路名稱也給分
+    if (streetName && item.street && (streetName.startsWith(item.street) || item.street.startsWith(streetName))) {
+      let score = 1;
+      if (address.includes(item.city)) score += 1;
+      if (address.includes(item.district)) score += 1;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = item;
+      }
     }
   }
-  
   if (bestMatch) {
     return {
       city: bestMatch.city,
@@ -145,7 +162,6 @@ function fuzzyParseAddress(address) {
       zipcode: bestMatch.zipcode
     };
   }
-  
   return null;
 }
 
