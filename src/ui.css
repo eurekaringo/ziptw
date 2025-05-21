@@ -7,32 +7,35 @@ body, html, #__next {
   min-height: 100vh;
 }
 
-.app-container {
-  max-width: 700px;
-  margin: 32px auto;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px #0001;
-  padding: 32px 24px 40px 24px;
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-h1 {
-  color: #1890ff;
-  font-size: 2rem;
-  font-weight: 700;
+.container h1 {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
-/* 搜尋列與按鈕 */
-.ant-input-search {
-  border-radius: 8px;
-  font-size: 1.1rem;
+.ant-card {
+  margin-bottom: 16px;
 }
-.ant-btn-primary {
-  background: #1890ff;
-  border-radius: 8px;
-  font-weight: 600;
+
+.ant-descriptions {
+  margin-bottom: 16px;
+}
+
+.ant-space {
+  width: 100%;
+}
+
+.ant-input-search {
+  width: 100%;
+}
+
+.ant-alert {
+  margin-top: 16px;
 }
 
 /* 語言切換下拉 */
@@ -54,19 +57,19 @@ h1 {
 
 /* 響應式設計 */
 @media (max-width: 900px) {
-  .app-container {
+  .container {
     max-width: 98vw;
     padding: 16px 4vw 32px 4vw;
   }
 }
 @media (max-width: 600px) {
-  .app-container {
+  .container {
     margin: 0;
     border-radius: 0;
     box-shadow: none;
     padding: 8vw 2vw 24vw 2vw;
   }
-  h1 {
+  .container h1 {
     font-size: 1.2rem;
     margin-bottom: 18px;
   }
@@ -95,20 +98,16 @@ h1 {
   margin-right: 8px;
 }
 
-.ant-alert {
-  border-radius: 8px;
-}
-
 @media (max-width: 576px) {
-  .app-container > div {
-    flex-direction: column !important;
-    gap: 8px !important;
+  .container {
+    padding: 16px;
   }
-  .ant-input-search,
-  .ant-btn,
-  .ant-input {
-    width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box;
+  
+  .ant-space {
+    flex-direction: column;
+  }
+  
+  .ant-space > * {
+    width: 100%;
   }
 }
